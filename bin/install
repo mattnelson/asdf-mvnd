@@ -27,13 +27,12 @@ installer() {
   case "$(uname -m)" in
     x86_64) architecture="amd64" ;;
     arm64) 
-      # Fallback to emulation via Rosetta on M1 Macs
+      architecture="aarch64"
       if [[ "$platform" = "darwin" ]]; then
+        # Fallback to emulation via Rosetta on M1 Macs if the version doesn't support aarch64
         if ! curl --silent --fail -IL "$(apache_download_url "$version" "${platform}" "${architecture}")" > /dev/null ; then 
           architecture="amd64"
           warn "Falling back to use x86_64 binary. aarch64 support was added in 0.8.2"
-        else 
-          architecture="aarch64"
         fi
       else
         fail "Unsupported architecture"
