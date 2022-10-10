@@ -29,8 +29,12 @@ installer() {
     arm64) 
       # Fallback to emulation via Rosetta on M1 Macs
       if [[ "$platform" = "darwin" ]]; then
-        architecture="amd64"
-        warn "Falling back to use x86_64 binary"
+        if ! curl --silent --fail -IL "$(apache_download_url "$version" "${platform}" "${architecture}")" > /dev/null ; then 
+          architecture="amd64"
+          warn "Falling back to use x86_64 binary. aarch64 support was added in 0.8.2"
+        else 
+          architecture="aarch64"
+        fi
       else
         fail "Unsupported architecture"
       fi
@@ -60,7 +64,7 @@ github_download_url() {
   local version=$1
   local platform=$2
   local architecture=$3
-  echo "https://github.com/mvndaemon/mvnd/releases/download/${version}/mvnd-${version}-${platform}-${architecture}.zip"
+  echo "https://github.com/apache/maven-mvnd/releases/download/${version}/mvnd-${version}-${platform}-${architecture}.zip"
 }
 
 apache_download_url() {
